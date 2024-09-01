@@ -49,3 +49,20 @@ passwords = ["not good", "give m-pass"]
 for password in hide(lengths(passwords)):
     print(password)
 
+##take password from user and hide it
+adj=input("Enter an adj:")
+noun=input("Enter a noun:")
+number=input("Enter a number:")
+sc=input("Enter a special character:")
+password=adj+noun+str(number) +sc
+print("Your password is: %s"%password) 
+def lengths(itr):
+    for ele in itr:
+        yield len(ele)
+def hide(itr):
+    for ele in itr:
+        yield ele* "*"
+password=adj+noun+str(number)+sc    
+for password in hide(lengths(password)):
+    print(password,end="") 
+
