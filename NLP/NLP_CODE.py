@@ -1,18 +1,5 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Thu Jun 13 09:01:41 2024
-
-@author: ashwi
-"""
-
-# -*- coding: utf-8 -*-
-"""
-Created on Wed Jun  5 12:06:48 2024
-
-@author: ADMIN
-"""
 ##############################################################
-##12/JUNE/2024
+
 '''PYTHON FOR NLP'''
 #NLP->Natural language Processing.
 #web scrapping:-scrapping the text from reviews and convert it into tabuler form.
