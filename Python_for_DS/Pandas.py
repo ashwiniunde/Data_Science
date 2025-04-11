@@ -1,701 +1,433 @@
-import matplotlib.pyplot as plt
-fig = plt.figure()
-songs_69.plot()
-plt.legend()
+# -*- coding: utf-8 -*-
+"""
+Created on Wed Apr  9 15:21:47 2025
 
-###############################################
-fig=plt.figure()
-songs_69.plot(kind='bar')
-songs_66.plot(kind='bar',color='r')
-plt.legend()
-################################################
+@author: ashwi
+"""
+#Pandas: Pandas is a powerful, open-source Python library 
+ # for data manipulation and analysis, particularly known
+ # for its flexible data structures like Series (1D labeled
+ # array) and DataFrames (2D labeled data). 
+
+"""
+Series: A one-dimensional labeled array capable of holding
+       data of any type (integers, strings, Python objects,etc.). 
+DataFrame: A two-dimensional labeled data structure, similar 
+      to a table with rows and columns, used for storing and 
+      manipulating tabular data.
+"""
+import pandas as pd
 import numpy as np
-data = pd.Series(np.random.randn(500),name='500_ramdom')
-fig = plt.figure()
-ax = fig.add_subplot(111)
-data.hist()
-###################
-############### DATA FRAME ###############
-## 4/4/2024 ##
-#What is Pandas data frame?
+technologies = {
+'Courses':["Spark","Pyspark","Hadoop","Pyhton"],
+'Fee':[20000,25000,26000,22000],
+'Duration':['','40days',np.nan,None],
+'Discount':[1000,2300,1500,1200]
+}
 
-'''
-It is 2D DS
-an immutable ,heterogeneous tabular
-DS with labled 
+indexes=['r1','r2','r3','r4']
+df=pd.DataFrame(technologies,index=indexes)
 
-'''
-
-##TO check version of pandas
-import pandas as pd
-pd.__version__
-#####################################
-#create using constructor
-#CREATE pandas dataframe from list
-import pandas as pd
-technologies=[["Spark",20000,"30days"],["pandas",20000,"40days"]]
-df=pd.DataFrame(technologies)
 print(df)
-"""WE have not given label to columns and indexs DF BY Default assign 
-incremental sequence number as label 
-here we have given col name and row index while displaying data"""
+"""
+nan is atype 
+np.nan float
+"" empty sstring
+"""
+df=pd.DataFrame(technologies,index=indexes)
+df2=df.dropna()
+print(df2)
 
-col_names=["course","free","Duration"]
-row_label=["a","b"]
-df=pd.DataFrame(technologies,columns=col_names,index=row_label)
-print(df)
-#################################
-df.dtypes
+################################
+#How to clean empty string
 
+#first drop rows with Nan (np.nan and None)
+df_clean = df.dropna(subset=['Duration'])
 
-#######################################################
-#you can also assign custom 
-#data type to column
-#set custom to dataframe
-import pandas as pd
-technologies={
-    'course':["Spark","Pyspark","Hadoop","Python","pandas","Oracle","java"],
-    'fee':[2000,25000,5000,60000,59000,76987,9000],
-    'duration':['10days','20days','30dyas','40days','50days','60days','70days'],
-    'discount':[12.2,23.3,56.8,45.4,56.6,6.3,78.2]
-    }
+#Then drop row with empty sting
+df_clean = df_clean[df_clean['Duration'] != '']
+print(df_clean)
+########################
+
+##Changes  all colums to same type in Pandas
+#df.astype(str) convert all cols into string
+
+df = df.astype(str)
+print(df.dtypes)
+"""
+Courses     object or string
+Fee         object
+Duration    object
+Discount    object
+dtype: object
+"""
+
+###################################
+
+#changes type for one or multiple columns in pandas
+#change type for one or multiple cols
+
+df=df.astype({"Fee":int,"Discount":float})
+print(df.dtypes)
+
+"""
+Courses      object
+Fee           int32
+Duration     object
+Discount    float64
+dtype: object
+
+Why does it become int32 ?
+
+Pandas internally choosses the most efficient
+platform-dependent Numpy dtype that corresponding to 
+python int. This depends on your operating system
+and python numpy version.
+on 32 - bit system int usuually maps to int 32
+on 64- bit system int often maps to int 64
+
+"""
+
+# we can explicitely control the dtype like below
+df=df.astype({"Fee":"int64","Discount":"float64"})
+print(df.dtypes)
+"""
+print(df.dtypes)
+Courses      object
+Fee           int64
+Duration     object
+Discount    float64
+dtype: object
+
+"""
+############################################
+#Convert all datatypes for all cols in a list
+
 df=pd.DataFrame(technologies)
-df
-print(df.dtypes)
-
-
-#Convert all types to all possible types
-df2=df.convert_dtypes()  #object to string
-print(df2.dtypes)
-####change all col to same types
-df=df.astype(str)
-print(df.dtypes)
-
-
-#change one or multiple columns############ERRROR
-df=df.astype({
-    "fee":int,"discount":float})
-print(df.dtypes)
-#Convert data types for all columns in a list#############ERROR
-df=pd.DataFrame(technologies)
-df.dtypes
-cols=['fee','discount']
+cols=['Fee','Discount']
 df[cols]=df[cols].astype('float')
 df.dtypes
-##Ignores error
-df=df.astype({'course':int},errors='ignore')
+"""  
+Courses      object
+Fee         float64
+Duration     object
+Discount    float64
+dtype: object
+
+converted into float col fee and discount
+"""
+#by using a loop
+for col in ['Fee','Discount']:
+    df[col] = df[col].astype('float')
+df.dtypes
+
+#####################################################
+#raise or Ignore Error when convert cols type fail
+
+df=df.astype({'Courses':int},errors='ignore')
+#here we ignore the error i.e convert str to int 
 df.dtypes
 #Generate error
-#### raise error
-df=df.astype({'course':int},errors='raisee')
+df=df.astype({'Courses':int},errors='raise')
+df.dtypes
+##########################################################
+#using DataFrame .to_numeric() to  convert numerical types 
+#convert feed col to numeric type
+
+df['Fee'] = pd.to_numeric(df['Fee'])
 df.dtypes
 
-#Convert feed col to numeric type
-df=df.astype(str)
-print(df.dtypes)
-df['discount']=pd.to_numeric(df['discount'])
+#np.nan : float() data types : by default convert into float64
+#convert multiple numeric types using apply() method
+#convert fee and discount in numeric
+
+df=pd.DataFrame(technologies)
 df.dtypes
-#####################################################
-import pandas as pd
-#create DF from dictionary
-df.to_csv('data_file.csv')
-#############################
-df=pd.read_csv('data_file.csv')
-#############################
-#pandas DF basuc operations
-#create DF with null/none to work with example
-import pandas as pd
-import numpy as np
-technologies=({
-    'course':["Spark","Pyspark","Hadoop","Python","pandas",None,"Spark","python"],
-    'fee':[234,568,7889,7989,np.nan,50000,5600,5600],
-    'duration':['30days','55dasy','34days','78dasy','16dasy','56days','','67days'],
-    'discount':[2000,7000,6700,67000,5600,600,67900,7000]
-    })
-row_labels=['r0','r1','r2','r3','r4','r5','r6','r7']
-df=pd.DataFrame(technologies,index=row_labels)
-print(df)
-##########################
-##5/4/2024
-#data frame properties
-df.shape
-#(8,4)
-df.size
-#32
-df.columns
-df.columns.values
-df.index
+df[['Fee','Discount']]= df[['Fee','Discount']].apply(pd.to_numeric)
 df.dtypes
-df.info
-#######Training on ML (offline)#########
-##1)understanding ,objectives
-##2)Data dict
-##3)EDA-Exploratory data analysis
-##4)Data processing
-###5)Model building
-##6)Evalution
-##7)Deployment
-###8)monitoring maintainance
-####################################
-#Accessing one columns contents
-df['fee']
-df['duration']
-##Accessing 2 columns contents
-cols=['fee','duration']
-df[cols]
-df[['fee','duration']]
-#select certain rows and assign it to another dataframe
-df2=df[:6]  #show rows from 0 to 5
-df2
-df3=df[6:]  #show rows from 6 onwards
-df3
-####################
-#df[roes,columns]
-#df[:,:]
-#df[:] only for rows
-df[:]
-#df[:,:2] all rows and frist,second columns
-#
-#accessing certain cell from duration
-df['duration'][5]
-df['fee'][5]
-#Substracting specific values from a column
-df['fee']=df['fee']-500
-df['fee']
-df['discount']=df['discount']-20
-df['discount']
-
-###Pandas to manipulate DF
-#describe DF
-#Describe DF for all numeric cols
-df.describe()
-#It will show 5 number summary
-########################################
-#rename()-Renames pandas DF columns
-df=pd.DataFrame(technologies,index=row_labels)
-#Assign new header by setting new col
-df.columns=['A','B','C','D']
-df
-#############################
-#rename col name using rename() method
-df=pd.DataFrame(technologies,index=row_labels)
-df.columns=['A','B','C','D']
-df
-df2=df.rename({'A':'C1','B':'C2'},axis=1)
-df2=df.rename({'C':'C3','D':'C4'},axis='columns')
-df2=df.rename(columns={'A':'C1','B':'C2'})
-df2
-#################
-#drop rows and cols 
-df=pd.DataFrame(technologies,index=row_labels)
-#Drop rows bt label
-df1=df.drop(['r1','r2'])
-df1
-#Delete rows and columns by position
-df1=df.drop(df.index[1])
-df1
-
-df1=df.drop(df.index[[1,3]])
-df1
-
-#Delete rows by index range
-df1=df.drop(df.index[2:1])
-df1
-#Whenn you have default index for rows
-df=pd.DataFrame(technologies)
-df1=df.drop(0)
-df1
-df1=pd.DataFrame(technologies)
-df1=df.drop
-
-
-#####10/04/2024#####
-#to check version of pandas
-import pandas as pd
-pd._version_
-
-import pandas as pd
-technologies={'Courses':["spark","pyspark","hadoop","python","pandas","oracle","java"],
-              'fee':[20000,25000,26000,22000,24000,21000,22000],
-              'Duration':["30days","40days","35days","40days","60days","50days","55days"],
-              'Discount':[11.8,23.7,13.4,15.7,12.5,25.4,18.4]
-              }
-df=pd.DataFrame(technologies)
-print(df)
-
-#explicitely using parameteer anem labels
-import pandas as pd
-technologies={'Courses':["spark","pyspark","hadoop","python","pandas","oracle","java"],
-              'fee':[20000,25000,26000,22000,24000,21000,22000],
-              'Duration':["30days","40days","35days","40days","60days","50days","55days"],
-              'Discount':[11.8,23.7,13.4,15.7,12.5,25.4,18.4]
-              }
-df2=df.drop(labels=["fee"],axis=1)
-df2
-#alternatively u can also use columns instead of labels
-df2=df.drop(columns=['fee'],axis=1)
-df2
-#drop column by index
-print(df.drop(df.columns[1],axis=1))
-df=pd.DataFrame(technologies)
-
-#using inplace=true
-df.drop(df.columns[2],axis=1,inplace=True)
-print(df)
 
 ##########################################
-#DROP two or more columns by label name
-df2=df.drop(["Courses","fee"],axis=1)
-print(df2)
-
-##########################################
-#Drop two or more columns by index
-df=pd.DataFrame(technologies)
-df
-df2=df.drop(df.columns[[0]],axis=1)
-print(df2)
-
-############################
-#drop columns from list of columns
-df=pd.DataFrame(technologies)
-print(df.columns)
-liscol=['Courses','fee']
-df2=df.drop(liscol,axis=1)
-print(df2)
-
-#########################
-#remove columns from DataFrame inplace
-df=pd.DataFrame(technologies)
-df.drop(df.columns[1],axis=1,inplace=True)
-df
-
-#############################
-#pandas select rows by index (position/label)
-#accesing rows/columns using index=>iloc is used
-#accessing columns using name=>loc
-
-import pandas as pd
-technologies={'Courses':["spark","pyspark","hadoop","python","pandas","oracle","java"],
-              'fee':[20000,25000,26000,22000,24000,21000,22000],
-              'Duration':["30days","40days","35days","40days","60days","50days","55days"],
-              'Discount':[11.8,23.7,13.4,15.7,12.5,25.4,18.4]
-              }
-row_labels=['r0','r1','r2','r3','r4','r5','r6']
-df=pd.DataFrame(technologies,index=row_lables)
-print(df)
-
-df=pd.DataFrame(technologies,index=row_labels)
-#below are quick exampels
-#df.iloc[startrow:endrow,startcolumn:endcolumn]
-df2=df.iloc[:,0:2]
-df2
-df3=df.iloc[:,0:1]
-df3
-#this line uses the slicing operator to get dataframe items by index
-#the first slice operator[:]indicates to return all rows
-#the second slice operator specifies that only columns 
-#between 0and 2(excluding 2)should be returned
-
-df2=df.iloc[0:2,:]
-df2
-#in this case, the first slice is[0:2]
-#requesting only rows 0 through 1 of the dataframe.
-#the second slice[:]indicates that all columns are required
-
-#slicing specifies rows and columns using iloc attribute
-df3=df.iloc[1:2,1:3]
-df3
-#another example
-df3=df.iloc[:,1:3]
-df3
-#the second operator [1:3] yeilds 1 and 3 only
-#select rows by integer index
-df2=df.iloc[2] #select Row by index
-df2
-
-
-###11/04/2024
-df2=df.iloc[[2,3,6]]#select rows by index list
-df2
-df2=df.iloc[1:5]#select rows by int index range
-df2
-df2=df.iloc[:1]#select first row
-df2
-df2=df.iloc[:3]#select first 3 rows
-df2
-df2=df.iloc[-1:]
-df2
-df2=df.iloc[::-1]#show all rows by reverse 
-df2
-df2=df.iloc[::1] #show all rows by index wise
-df2
-df2=df.iloc[::2]
-df2
-df2=df.iloc[::]
-df2
-df2=df.iloc[-3:] #show last 3 rows
-df2
-df2=df.iloc[-1:] #show last one row
-df2
-#############################################
-##select rows by index label 
-df2=df.loc[['r2']] #select row by label
-df2
-df2=df.loc[['r2','r3','r6']]  #select rows by index label
-df2
-df2=df.loc['r1':'r5']
-df2
-df2=df.loc['r1':'r5':2] #select alternate rows with index label
-df2
-############################################
-#pandas select col by name or index
-#By using df[] Notation
-df2=df['Courses']
-df2
-###select multiple columns
-df2=df[["Courses","fee","Duration"]]
-df2
-#using loc[] to take column slice
-#loc[] syntax to slice column
-#df.loc[:,start:stop:step]
-##select multiple columns
-df2=df.loc[:,["Courses","fee","Duration"]] #error
-df2
-#select random columns
-df2=df.loc[:,["Courses","Duration","Discount"]]
-df2
-#select col between 2 columns
-df2=df.loc[:,'Courses':'Discount']
-df2
-#select col by range
-df2=df.loc[:,'Duration']
-df2
-##selet all col upto durationdf2=df.loc[:,'Duration']
-df2=df.loc[:,:'Duration']
-df2
-##select alternate columns
-df2=df.loc[:,::2]
-df2
-#########################################################
-#pandas.DataFrame.query() by example
-#Query all rows with courses equals 'Spark'
-df2=df.query("Courses=='spark'")
-print(df2) 
-########################################
-#not equal to condition
-df2=df.query("Courses!='spark'")
-df2
-########################################
-#pandas add col DF
-import pandas as pd
-import numpy as np
-
-technologies={'Courses':["spark","pyspark","hadoop","python","pandas"],
-              'Fee':[20000,25000,26000,22000,24000],
-              'Discount':[11.8,23.7,13.4,15.7,12.5]
-              }
-df=pd.DataFrame(technologies)
-print(df)
-
-###########################
-##pandas add col DF 
-#Add new col to DataFrame
-tutor=['ram','sai','sham','om','alok']
-df2=df.assign(TutorsAssigned=tutor)
-print(df2)
-#########################################
-#add multiple col to DF
-MNCcompanies=['TATA','HCL','INFOSYS','GOOGLE','AMAZON']
-df2=df.assign(MNC=MNCcompanies,tutor=tutor)
-df2
-#######################
-#Derive new column from Existing column using lambda function
-df=pd.DataFrame(technologies)
-df2=df.assign(Discount_percent=lambda x: x.Fee * x.Discount/100)
-print(df2)
-
-##################################
-#Append col to existing DF
-#Add new col to existing DF
-df=pd.DataFrame(technologies)
-df["MNCcompanies"]=MNCcompanies
-print(df)
-###################################
-#inserting col at sepecific location
-df=pd.DataFrame(technologies)
-df.insert (0,'Tutors',tutor)
-print(df)
-######################################
-######################################
-#Rename multiple columns
-import pandas as pd
-technologies={'Courses':["spark","pyspark","hadoop","python","pandas","oracle","java"],
-              'fee':[20000,25000,26000,22000,24000,21000,22000],
-              'Duration':["30days","40days","35days","40days","60days","50days","55days"],
-              'Discount':[11.8,23.7,13.4,15.7,12.5,25.4,18.4]
-              }
-df=pd.DataFrame(technologies)
-df.columns
-print(df.columns)
-
-
-df.rename(columns={'Courses':'Course_list'})
-df
-df.rename(columns={'Courses':'Course_list'},axis='columns')
-df.columns
-print(df.columns)
-
-
-######################
-##15/04/2025##
-
-import pandas as pd
-technologies={'Courses':["spark","pyspark","hadoop","python","pandas","oracle","java"],
-              'fee':[20000,25000,26000,22000,24000,21000,22000],
-              'Duration':["30days","40days","35days","40days","60days","50days","55days"],
-              'Discount':[11.8,23.7,13.4,15.7,12.5,25.4,18.4]
-              }
-df=pd.DataFrame(technologies)
-df.columns
-print(df.columns)
-############################################
-##########################################
-#quick exampl of get the number of rows inDF
+#Quick examples of Get the number of rows in DataFrame
 rows_count=len(df.index)
-rows_count
+rows_count # 4
 rows_count=len(df.axes[0])
-rows_count
-column_count=len(df.axes[1])
-column_count
+rows_count # 4
 
-######################################
+###################################################
 df=pd.DataFrame(technologies)
-row_count=df.shape[0] #number of rows
+row_count=df.shape[0]
+col_count=df.shape[1]
 row_count
-col_count=df.shape[1]#number of columns
-print(row_count)
-print(col_count)
+col_count
 
-####################################333
-#pandas apply function to col
-#using DF.apply() to apply function add col
+
+###############################################
+#pandas Apply fun to cols
+# Below are quick ex
+# unsing Dataframe.apply() to apply function add col
+
 import pandas as pd
 import numpy as np
-data={"A":[1,2,3],
-      "B":[4,5,6],
-      "C":[7,8,9]}
-df=pd.DataFrame(data)
-print(df)
-
+data=[(3,5,7),(2,4,6),(5,8,9)]
+df=pd.DataFrame(data,columns=['A','B','C'])
+df
 
 def add_3(x):
-    return x+3
+    return x+3 
 df2=df.apply(add_3)
 df2
-df2=((df.A).apply(add_3)) #only change A column by adding 3
-df2
-##########################
 
-#using apply function single column
+###########################################
+#Using apply function single col
 def add_4(x):
     return x+4
-df["B"]=df["B"].apply(add_4)
+df["B"]= df["B"].apply(add_4)
 df["B"]
 
+# for multiple cols
+df=pd.DataFrame(data,columns=['A','B','C'])
+df[["A","B"]]=df[["A","B"]].apply(add_4)
+df[["A","B"]]
 
-#apply on multiple columns
-df[['A','B']]=df[['A','B']].apply(add_4) #add 4 in  A and B column
+df=pd.DataFrame(data,columns=['A','B','C'])
+
+#apply lamda function to each column
+df2=pd.DataFrame(data,columns=["A","B","C"])
+df2=df.apply(lambda x:x+10)
+df2
+##################################
+#apply lambda function to single columns
+#using Dataframe .apply() and lambda function
+df["A"] =df["A"].apply(lambda x:x-2)
+df
+#######################################
+#using pandas.DataFrame colums
+#to apply functio cols
+# Using DataFrame.transform()
+def add_2(x):
+    return x+2 
+df=df.transform(add_2)
+df 
+
+#########################################
+#using pandas.DataFrame.map() to single columns
+df["A"] = df["A"].map(lambda A:A/2)
 df
 
-#apply a lambda function to each column
-df2=df.apply(lambda x:x+10) #added 10 in every column
-df2
+#################################################################
+#################################################################
+#Using Numpy  function on Single Columns
+# Using DataFrame.apply() & [] operator
 
 
-##################################
-#transform fun
-def add_2(x): #add  2 in each column
-    return x+2
-df=df.transform(add_2)
-print(df)
-
-
-##################################
-#map() function for single column
-data={"A":[1,2,3],
-      "B":[4,5,6],
-      "C":[7,8,9]}
-df=pd.DataFrame(data)
-print(df)
-df['A']=df['A'].map(lambda A:A/2) #It will divide column A by 2
-print(df)
-
-#############################################
-#using numpy function on single column
-#using DataFrame.apply and []operator
-data={"A":[1,2,3],
-      "B":[4,5,6],
-      "C":[7,8,9]}
-df=pd.DataFrame(data)
-print(df)
+import pandas as pd
 import numpy as np
-df['A']=df['A'].apply(np.square) #IT will give square of column A
+data=[(3,5,7),(2,4,6),(5,8,9)]
+df=pd.DataFrame(data,columns=['A','B','C'])
+df
+
+"""
+  A  B  C
+0  3  5  7
+1  2  4  6
+2  5  8  9
+"""
+df['A']=df['A'].apply(np.square)
 print(df)
+"""
+   A  B  C
+0   9  5  7
+1   4  4  6
+2  25  8  9
+"""
 
-########################################
-#using NumPy.square() method
-#Using numpy.square() and [] operator
-df['A']=np.square(df['A'])
-print(df)
-
-####################################
-#Pandas groupby() with Examples
-
-import pandas as pd
-technologies={'Courses':["spark","pyspark","hadoop","python","pandas","Hadoop","spark","python","Na"],
-              'fee':[22000,25000,23000,24000,26000,25000,25000,22000,1500],
-              'Duration':["30days","50days","35days","40days","60days","50days","55days","30days","50days"],
-              'Discount':[11.8,23.7,13.4,15.7,18.4,25.4,18.4,11.8,13.4]
-              }
-df=pd.DataFrame(technologies)
-print(df)
-#for single column
-df2=df.groupby(['Courses']).sum()
-print(df2)
-#for multiple columns
-df2=df.groupby(['Courses','fee']).sum() ###########ee
-print(df2)
-
-############################
-#add index to th group data
-#add the indexx to the rows
-df2=df.groupby(['Courses','fee']).sum().reset_index() 
-print(df2)
-
-#########################################
-#get the list of all column name headers as a list
-column_headers=list(df.columns.values)
-print("the column Header::",column_headers) #gives list of columns
-############################33
-#Using list(df) to get column headers as a list
-column_header=list(df)
-column_headers
-
-#########################################################
-######### 16/04/2024 ############ Tuesday ########
-##pandas Shuffle DF rows
-import pandas as pd
-technologies={'Courses':["spark","pyspark","hadoop","python","pandas","oracle","java"],
-              'fee':[20000,25000,26000,22000,24000,21000,22000],
-              'Duration':["30days","40days","35days","40days","60days","50days","55days"],
-              'Discount':[11.8,23.7,13.4,15.7,18.4,25.4,18.4]
-              }
-df=pd.DataFrame(technologies)
-print(df)
-#Pandas Shuffle Df row 
-#shuffle the df rows and return all rows
-df1=df.sample(frac =1) 
-print(df1)
-#####################################
-#It will create new index starting from 0(zero)
-df1=df.sample(frac=1).reset_index()
-print(df1)
-####################################
-#drop shuffle index
-df1=df.sample(frac=1).reset_index(drop=True)
-print(df1)
-#######################################
-#inner join show common cols
-import pandas as pd
-technologies={'course':["spark","pyspark","python","pandas"],
-              'fee':[20000,25000,22000,30000],
-              'duration':['30days','40days','35days','50days']}
-index_labels=['r1','r2','r3','r4']
-df1=pd.DataFrame(technologies,index=index_labels)
- 
-import pandas as pd
-technologies2={'course':['spark','java','python','go'],
-               'discount':[2000,23000,1200,2000]}
-index_labels2=['r1','r6','r3','r5']
-df2=pd.DataFrame(technologies2,index=index_labels2)
-#pandas join
-df3=df1.join(df2,lsuffix="_left",rsuffix="_roght")
-print(df3)
 ###########################################
-#pandas inner join DataFrame
-df3=df1.join(df2,lsuffix="_left",rsuffix="_roght",how='inner')
-print(df3)
+# Using Numpy.square() Method
+# Using numpy.square()  and [] operator
+df['A']=np.square(df['A'])
+df
+"""
+   A  B  C
+0   81  5  7
+1   16  4  6
+2  625  8  9
+"""
 #######################################
-#pandas left join dataframe
-df3=df1.join(df2,lsuffix="_left",rsuffix="_right",how='left')
-print(df3)
-#pandas right join
-df3=df1.join(df2,lsuffix="_left",rsuffix="_roght",how='right')
-print(df3)
-############################################
-#Pandas Merge
+# Pandas groupby() with Examples
 import pandas as pd
-technologies={'course':["spark","pyspark","python","pandas"],
-              'fee':[20000,25000,22000,30000],
-              'duration':['30days','40days','35days','50days']}
-index_labels=['r1','r2','r3','r4']
-df1=pd.DataFrame(technologies,index=index_labels)
- 
-import pandas as pd
-technologies2={'course':['spark','java','python','go'],
-               'discount':[2000,23000,1200,2000]}
-index_labels2=['r1','r6','r3','r5']
-df2=pd.DataFrame(technologies2,index=index_labels2)
-#using pandas merge
-df3=pd.merge(df1,df2)
-print(df3)
+technologies={'Courses':["spark","Pyspark","Hadoop","Python","Pandas","Hadoop","Spark","Python","NA"],
+              'Fee':[22000,25000,23000,24000,26000,25000,25000,22000,1500],
+              'Duration':["30days","50days","55days","40days","60days","35days","30days","50days","40days"],
+              'Discount':[1000,2300,1000,1200,2500,None,1400,1600,0]
+              }
 
-#using DataFraem.merge()
-df5=df1.merge(df2) #same result as above
-print(df5)
-##############################################
-#use pandas.concat() to connect two DF
-import pandas as pd
-df=pd.DataFrame({'course':["spark","pyspark","python","pandas"],
-                 'fee':[20000,25000,22000,24000]})
-df1=pd.DataFrame({'course':["pandas","hadoop","hyperion","java"],
-                  'fee':[25000,25200,24500,24900]})
-data=[df,df1]
-df2=pd.concat(data) #connect 2 series 
+df = pd.DataFrame(technologies)
+print(df)
+"""
+ Courses    Fee Duration  Discount
+0    spark  22000   30days    1000.0
+1  Pyspark  25000   50days    2300.0
+2   Hadoop  23000   55days    1000.0
+3   Python  24000   40days    1200.0
+4   Pandas  26000   60days    2500.0
+5   Hadoop  25000   35days       NaN
+6    Spark  25000   30days    1400.0
+7   Python  22000   50days    1600.0
+8       NA   1500   40days       0.0
+"""
+
+# Use groupby for single column to compute the sum of similar type row
+df2=df.groupby(['Courses']).sum()
 df2
-#############################4
-#concat multiple DATDFRAME 
+"""
+ Fee  Discount
+Courses                 
+Hadoop   48000    1000.0
+NA        1500       0.0
+Pandas   26000    2500.0
+Pyspark  25000    2300.0
+Python   46000    2800.0
+Spark    25000    1400.0
+spark    22000    1000.0
+"""
+# For multiple col
+df2 = df.groupby(['Courses','Duration']).sum()
+print(df2)
+"""
+  Fee  Discount
+Courses Duration                 
+Hadoop  35days    25000       0.0
+        55days    23000    1000.0
+NA      40days     1500       0.0
+Pandas  60days    26000    2500.0
+Pyspark 50days    25000    2300.0
+Python  40days    24000    1200.0
+        50days    22000    1600.0
+Spark   30days    25000    1400.0
+spark   30days    22000    1000.0
+"""
+#Add index to the gruopby data
+# add row index to the group by result
+df2 = df.groupby(['Courses','Duration']).sum().reset_index()
+print(df2)
+
+"""
+ Courses Duration    Fee  Discount
+0   Hadoop   35days  25000       0.0
+1   Hadoop   55days  23000    1000.0
+2       NA   40days   1500       0.0
+3   Pandas   60days  26000    2500.0
+4  Pyspark   50days  25000    2300.0
+5   Python   40days  24000    1200.0
+6   Python   50days  22000    1600.0
+7    Spark   30days  25000    1400.0
+8    spark   30days  22000    1000.0
+"""
+
+###############################################
+#Pandas Get col names from DataFrame
 import pandas as pd
-df=pd.DataFrame({'course':["spark","pyspark","python","pandas"],
-                 'fee':[20000,25000,22000,24000]})
-df1=pd.DataFrame({'course':["unix","hadoop","hyperion","java"],
-                  'fee':[25000,25200,24500,24900]})
-df2=pd.DataFrame({'duration':['30days','40days','35days','60days'],
-                  'discount':[1000,2300,2500,3000]})
-#append multiple df
-df3=pd.concat([df,df1,df2])
-print(df3)
+import numpy as np
+
+technologies = {
+'Courses':["Spark","Pyspark","Hadoop","Pyhton","Pandas"],
+'Fee':[22000,25000,23000,24000,26000],
+'Duration':['30days','50days','30days',None,np.nan],
+'Discount':[1000,2300,1000,1200,2500]
+}
+df=pd.DataFrame(technologies)
+print(df)
+
+#get th list of all col names from headers
+col_headers= list(df.columns.values)
+print("The Column Header:",col_headers)
+"""
+The Column Header: ['Courses', 'Fee', 'Duration', 'Discount']
+"""
+
+# Using list(df) to get the col headers as l list
+col_headers= list(df.columns)
+col_headers
+"""
+['Courses', 'Fee', 'Duration', 'Discount']
+"""
+
+# Using list(df) to get col name
+col_headers= list(df)
+col_headers
+#  ['Courses', 'Fee', 'Duration', 'Discount']
+
 
 #########################################
-##18/04/2024
-#write DF to excel file
-df.to_excel('c/10-python/Course.xlsx')
-##################################
-import pandas as pd
-df=pd.read_excel()
+#Pandas shuffle DataFrame Rows
+technologies = {
+'Courses':["Spark","Pyspark","Hadoop","Pyhton","Pandas","Oracle","java"],
+'Fee':[20000,25000,26000,22000,24000,21000,22000],
+'Duration':['30days','40days','35days','40days','60days','50days','55days'],
+'Discount':[1000,2300,1500,1200,2500,2100,200]
+}
 
-####################################
-#using series.values.tolist()
-col_list=df.course.values ##convert a course into list['spark','pyspark','python','pandas']
-print(col_list)
-col_list=df.course.values.tolist()
-print(col_list)
+df=pd.DataFrame(technologies)
+print(df)
+"""
+ Courses    Fee Duration  Discount
+0    Spark  20000   30days      1000
+1  Pyspark  25000   40days      2300
+2   Hadoop  26000   35days      1500
+3   Pyhton  22000   40days      1200
+4   Pandas  24000   60days      2500
+5   Oracle  21000   50days      2100
+6     java  22000   55days       200
+"""
+#Shuffle th Dataframe rows and return all rows
+df1 = df.sample(frac = 1)
+df1
 
-##using series.values.tolist()
-col_list=df["course"].values.tolist()
-print(col_list)
+"""
+index will shuffled here
+Courses    Fee Duration  Discount
+2   Hadoop  26000   35days      1500
+6     java  22000   55days       200
+3   Pyhton  22000   40days      1200
+5   Oracle  21000   50days      2100
+4   Pandas  24000   60days      2500
+0    Spark  20000   30days      1000
+1  Pyspark  25000   40days      2300
+"""
 
-##using list() function
-col_list=list(df["course"])
-print(col_list)
+df1 = df.sample(frac = 1).reset_index()
+print(df1)
+
+"""
+index  Courses    Fee Duration  Discount
+0      2   Hadoop  26000   35days      1500
+1      3   Pyhton  22000   40days      1200
+2      4   Pandas  24000   60days      2500
+3      5   Oracle  21000   50days      2100
+4      6     java  22000   55days       200
+5      1  Pyspark  25000   40days      2300
+6      0    Spark  20000   30days      1000
+"""
+# Drop shuffle index
+df1=df.sample(frac = 1).reset_index(drop=True)
+print(df1)
+
+"""
+Courses    Fee Duration  Discount
+0   Oracle  21000   50days      2100
+1     java  22000   55days       200
+2    Spark  20000   30days      1000
+3   Pandas  24000   60days      2500
+4   Hadoop  26000   35days      1500
+5   Pyhton  22000   40days      1200
+6  Pyspark  25000   40days      2300
+"""
+
+#############################################################
+   
+
+
+
+
+
 
